@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace SchemaGenerator
 {
-    public class SchemaRegistry
+    public class SchemaRegistry : ISchemaRegistry
     {
         private readonly JsonSerializerSettings _jsonSerializerSettings;
 
