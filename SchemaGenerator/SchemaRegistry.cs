@@ -29,7 +29,7 @@ namespace SchemaGenerator
             Definitions = new Dictionary<string, Schema>();
         }
 
-        public Parameter CreateParameter(ApiParameterDescription paramDesc, SchemaRegistry schemaRegistry)
+        public Parameter CreateParameter(ApiParameterDescription paramDesc)
         {
             var parameter = new Parameter
             {
@@ -41,19 +41,19 @@ namespace SchemaGenerator
             {
                 parameter.type = "string";
                 parameter.required = true;
-                return parameter;
+                return HandleFromUriParams.Apply(parameter, this, paramDesc);
             }
 
             parameter.required = paramDesc.Location.Equals("path", StringComparison.InvariantCultureIgnoreCase) || !paramDesc.ParameterDescriptor.IsOptional;
             parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
 
-            var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
+            var schema = GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
             if (parameter.@in == "body")
                 parameter.schema = schema;
             else
                 parameter.PopulateFrom(schema);
 
-            return parameter;
+            return HandleFromUriParams.Apply(parameter, this, paramDesc);
         }
 
         public Schema GetOrRegister(Type type)

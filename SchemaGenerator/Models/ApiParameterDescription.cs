@@ -2,7 +2,7 @@
 {
     public class ApiParameterDescription
     {
-        public ApiParameterDescription(string name, string location, ParameterDescriptor param)
+        public ApiParameterDescription(ParameterDescriptor param, string name = "", string location = "query")
         {
             Name = name;
             Location = location;

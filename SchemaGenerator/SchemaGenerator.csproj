@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HandleFromUriParams.cs" />
     <Compile Include="Models\ApiParameterDescription.cs" />
     <Compile Include="JsonContractExtensions.cs" />
     <Compile Include="JsonPropertyExtensions.cs" />

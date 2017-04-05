@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SchemaGenerator;
+using SchemaGenerator.Models;
 
 namespace UnitTests
 {
@@ -18,7 +19,10 @@ namespace UnitTests
         public void ItShouldCreateParameter()
         {
             var sut = new SchemaRegistry();
-            var actual = sut.CreateParameter(new SchemaGenerator.Models.ApiParameterDescription("", "query", new SchemaGenerator.Models.ParameterDescriptor(typeof(SomeClass))), sut);
+            var parameterDescriptor = new ParameterDescriptor(typeof(SomeClass));
+            var apiParameterDescription = new ApiParameterDescription(parameterDescriptor);
+
+            var actual = sut.CreateParameter(apiParameterDescription);
             Assert.AreEqual(sut.Definitions.Count, 1);
         }
 
