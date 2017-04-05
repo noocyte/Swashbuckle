@@ -49,6 +49,8 @@
     <Compile Include="Models\ApiParameterDescription.cs" />
     <Compile Include="JsonContractExtensions.cs" />
     <Compile Include="JsonPropertyExtensions.cs" />
+    <Compile Include="Models\DocumentationDescriptionAttribute.cs" />
+    <Compile Include="Models\DocumentationIgnoreAttribute.cs" />
     <Compile Include="Models\ParameterDescriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaExtensions.cs" />

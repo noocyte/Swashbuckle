@@ -75,27 +75,24 @@ namespace SchemaGenerator
 
         public IDictionary<string, Schema> Definitions { get; private set; }
 
-        private Schema CreateInlineSchema(Type type)
+        private Schema CreateInlineSchema(Type type, string description = "")
         {
             var jsonContract = _contractResolver.ResolveContract(type);
 
             if (jsonContract is JsonPrimitiveContract)
-                return CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract);
+                return CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract, description);
 
-            var dictionaryContract = jsonContract as JsonDictionaryContract;
-            if (dictionaryContract != null)
+            if (jsonContract is JsonDictionaryContract dictionaryContract)
                 return dictionaryContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
                     : CreateDictionarySchema(dictionaryContract);
 
-            var arrayContract = jsonContract as JsonArrayContract;
-            if (arrayContract != null)
+            if (jsonContract is JsonArrayContract arrayContract)
                 return arrayContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
                     : CreateArraySchema(arrayContract);
 
-            var objectContract = jsonContract as JsonObjectContract;
-            if (objectContract != null && objectContract.IsInferrable())
+            if (jsonContract is JsonObjectContract objectContract && objectContract.IsInferrable())
                 return CreateRefSchema(type);
 
             // Fallback to abstract "object"
@@ -119,12 +116,12 @@ namespace SchemaGenerator
                 String.Format("Unsupported type - {0} for Defintitions. Must be Dictionary, Array or Object", type));
         }
 
-        private Schema CreatePrimitiveSchema(JsonPrimitiveContract primitiveContract)
+        private Schema CreatePrimitiveSchema(JsonPrimitiveContract primitiveContract, string description)
         {
             var type = Nullable.GetUnderlyingType(primitiveContract.UnderlyingType) ?? primitiveContract.UnderlyingType;
 
             if (type.IsEnum)
-                return CreateEnumSchema(primitiveContract, type);
+                return CreateEnumSchema(primitiveContract, type, description);
 
             switch (type.FullName)
             {
@@ -132,29 +129,29 @@ namespace SchemaGenerator
                 case "System.UInt16":
                 case "System.Int32":
                 case "System.UInt32":
-                    return new Schema { type = "integer", format = "int32" };
+                    return new Schema { type = "integer", format = "int32", description = description };
                 case "System.Int64":
                 case "System.UInt64":
-                    return new Schema { type = "integer", format = "int64" };
+                    return new Schema { type = "integer", format = "int64", description = description };
                 case "System.Single":
-                    return new Schema { type = "number", format = "float" };
+                    return new Schema { type = "number", format = "float", description = description };
                 case "System.Double":
                 case "System.Decimal":
-                    return new Schema { type = "number", format = "double" };
+                    return new Schema { type = "number", format = "double", description = description };
                 case "System.Byte":
                 case "System.SByte":
-                    return new Schema { type = "string", format = "byte" };
+                    return new Schema { type = "string", format = "byte", description = description };
                 case "System.Boolean":
-                    return new Schema { type = "boolean" };
+                    return new Schema { type = "boolean", description = description };
                 case "System.DateTime":
                 case "System.DateTimeOffset":
-                    return new Schema { type = "string", format = "date-time" };
+                    return new Schema { type = "string", format = "date-time", description = description };
                 default:
-                    return new Schema { type = "string" };
+                    return new Schema { type = "string", description = description };
             }
         }
 
-        private Schema CreateEnumSchema(JsonPrimitiveContract primitiveContract, Type type)
+        private Schema CreateEnumSchema(JsonPrimitiveContract primitiveContract, Type type, string description)
         {
             var stringEnumConverter = primitiveContract.Converter as StringEnumConverter
                 ?? _jsonSerializerSettings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
@@ -165,6 +162,7 @@ namespace SchemaGenerator
 
                 return new Schema
                 {
+                    description = description,
                     type = "string",
                     @enum = camelCase
                         ? type.GetEnumNames().Select(name => name.ToCamelCase()).ToArray()
@@ -174,6 +172,7 @@ namespace SchemaGenerator
 
             return new Schema
             {
+                description = description,
                 type = "integer",
                 format = "int32",
                 @enum = type.GetEnumValues().Cast<object>().ToArray()
@@ -203,11 +202,15 @@ namespace SchemaGenerator
         private Schema CreateObjectSchema(JsonObjectContract jsonContract)
         {
             var properties = jsonContract.Properties
-                .Where(p => !p.Ignored)
+                .Where(p => !p.Ignore())
                 .Where(p => !p.IsObsolete())
                 .ToDictionary(
                     prop => prop.PropertyName,
-                    prop => CreateInlineSchema(prop.PropertyType).WithValidationProperties(prop)
+                    prop =>
+                    {
+                        var description = prop.GetDescription();
+                        return CreateInlineSchema(prop.PropertyType, description).WithValidationProperties(prop);
+                    }
                 );
 
             var required = jsonContract.Properties.Where(prop => prop.IsRequired())
@@ -220,18 +223,6 @@ namespace SchemaGenerator
                 properties = properties,
                 type = "object"
             };
-
-            //foreach (var filter in _schemaFilters)
-            //{
-            //    filter.Apply(schema, this, jsonContract.UnderlyingType);
-            //}
-
-            //// NOTE: In next major version, _modelFilters will completely replace _schemaFilters
-            //var modelFilterContext = new ModelFilterContext(jsonContract.UnderlyingType, jsonContract, this);
-            //foreach (var filter in _modelFilters)
-            //{
-            //    filter.Apply(schema, modelFilterContext);
-            //}
 
             return schema;
         }
