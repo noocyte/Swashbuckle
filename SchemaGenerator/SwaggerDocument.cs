@@ -71,8 +71,6 @@ namespace SchemaGenerator
         public ExternalDocs externalDocs;
 
         public object example;
-
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
     public class PartialSchema
