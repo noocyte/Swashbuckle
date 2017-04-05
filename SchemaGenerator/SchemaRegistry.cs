@@ -29,7 +29,7 @@ namespace SchemaGenerator
             Definitions = new Dictionary<string, Schema>();
         }
 
-        public Parameter CreateParameter(ApiParameterDescription paramDesc)
+        public IEnumerable<Parameter> CreateParameters(ApiParameterDescription paramDesc)
         {
             var parameter = new Parameter
             {

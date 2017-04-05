@@ -6,7 +6,7 @@ namespace SchemaGenerator
 {
     internal static class HandleFromUriParams
     {
-        public static Parameter Apply(Parameter parameter, SchemaRegistry schemaRegistry, ApiParameterDescription apiDescription)
+        public static IList<Parameter> Apply(Parameter parameter, SchemaRegistry schemaRegistry, ApiParameterDescription apiDescription)
         {
             if (parameter == null) return null;
 
@@ -14,7 +14,7 @@ namespace SchemaGenerator
             HandleFromUriArrayParams(parameters);
             HandleFromUriObjectParams(parameters, schemaRegistry, apiDescription);
 
-            return parameter;
+            return parameters;
         }
         public static IList<Parameter> Apply(IList<Parameter> parameters, SchemaRegistry schemaRegistry, ApiParameterDescription apiDescription)
         {
