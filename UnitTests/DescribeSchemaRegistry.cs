@@ -25,7 +25,7 @@ namespace UnitTests
 
             var actual = sut.CreateParameters(apiParameterDescription);
             Assert.AreEqual(sut.Definitions.Count, 1);
-            Assert.AreEqual(sut.Definitions["SomeClass"].properties.Count, 2);
+            Assert.AreEqual(sut.Definitions["SomeClass"].properties.Count, 3);
         }
 
         class SomeClass
@@ -37,6 +37,7 @@ namespace UnitTests
             public string JsonIgnoredProp { get; set; }
             [DocumentationIgnore]
             public string DocIgnoredProp { get; set; }
+            public int[] Numbers { get; set; }
         }
     }
 }

@@ -25,7 +25,7 @@ namespace SchemaGenerator
 
         public static string GetDescription(this JsonProperty jsonProperty)
         {
-            if (!jsonProperty.HasAttribute<DocumentationDescriptionAttribute>()) return string.Empty;
+            if (!jsonProperty.HasAttribute<DocumentationDescriptionAttribute>()) return null;
             var propInfo = jsonProperty.PropertyInfo();
 
             foreach (var attr in propInfo.CustomAttributes)
@@ -36,7 +36,7 @@ namespace SchemaGenerator
                 }
             }
 
-            return string.Empty;
+            return null;
         }
 
         public static bool HasAttribute<T>(this JsonProperty jsonProperty)

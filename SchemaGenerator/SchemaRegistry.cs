@@ -75,7 +75,7 @@ namespace SchemaGenerator
 
         public IDictionary<string, Schema> Definitions { get; private set; }
 
-        private Schema CreateInlineSchema(Type type, string description = "")
+        private Schema CreateInlineSchema(Type type, string description = null)
         {
             var jsonContract = _contractResolver.ResolveContract(type);
 
