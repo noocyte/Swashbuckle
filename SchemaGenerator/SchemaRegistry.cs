@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using SchemaGenerator.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,33 @@ namespace SchemaGenerator
             _contractResolver = new DefaultContractResolver();
             _referencedTypes = new Dictionary<Type, SchemaInfo>();
             Definitions = new Dictionary<string, Schema>();
+        }
+
+        public Parameter CreateParameter(ApiParameterDescription paramDesc, SchemaRegistry schemaRegistry)
+        {
+            var parameter = new Parameter
+            {
+                @in = paramDesc.Location,
+                name = paramDesc.Name
+            };
+
+            if (paramDesc.ParameterDescriptor == null)
+            {
+                parameter.type = "string";
+                parameter.required = true;
+                return parameter;
+            }
+
+            parameter.required = paramDesc.Location.Equals("path", StringComparison.InvariantCultureIgnoreCase) || !paramDesc.ParameterDescriptor.IsOptional;
+            parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
+
+            var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
+            if (parameter.@in == "body")
+                parameter.schema = schema;
+            else
+                parameter.PopulateFrom(schema);
+
+            return parameter;
         }
 
         public Schema GetOrRegister(Type type)

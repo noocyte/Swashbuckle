@@ -1,14 +1,28 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace SchemaGenerator
+namespace SchemaGenerator.Models
 {
     public class ExternalDocs
     {
         public string description;
         public string url;
     }
+    public class Parameter : PartialSchema
+    {
+        [JsonProperty("$ref")]
+        public string @ref;
 
+        public string name;
+
+        public string @in;
+
+        public string description;
+
+        public bool? required;
+
+        public Schema schema;
+    }
     public class Schema
     {
         [JsonProperty("$ref")]

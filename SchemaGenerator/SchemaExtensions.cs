@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Serialization;
+using SchemaGenerator.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 
