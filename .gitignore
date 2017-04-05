@@ -2,11 +2,11 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-## Custom ignore for Arcadia
+## Custom ignore
 config.json
 .vs/
 sfpackaging
-
+swagger-ui
 ## Fake
 .fake/
 
